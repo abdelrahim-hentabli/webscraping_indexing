@@ -12,4 +12,8 @@ To compile on a linux system, change to the main directory and run the compile.s
 ```
 chmod +x compile.sh
 ```
-You need to change the PATH_TO_LUCENE to your path to lucene
+You need to export a PATH_TO_LUCENE variable for the compile to run correctly
+```
+export PATH_TO_LUCNE=<your path to lucene>
+```
+This needs to be done each time you re-open your terminal, or you can put it in your .bashrc/.zshrc
