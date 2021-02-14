@@ -45,15 +45,24 @@ public class LuceneTest {
         while ((nextLine = csvReader.readNext()) != null){
             // String [] values = Arrays.asList(nextLine);
             addDoc(w, nextLine[3], nextLine[0]);
+            
+            
+            //Hashtag inputting (Work in progress)
+            // if(!nextLine[6].equals("[]")){
+            //     String[] hashtags = nextLine[6].split(",");
+            //     for(int i = 0; i < hashtags.length; i++){
+            //         addDoc(w, hashtags[i].substring(2,hashtags[i].length()-2), nextLine[0]);
+            //     }
+            // }
+            // else{
+            //     addDoc(w, nextLine[3], nextLine[0]);
+            // }
         }
 
         // 1. create the index
-        // addDoc(w, "Lucene in Action", "193398817");
-        // addDoc(w, "Lucene for Dummies", "55320055Z");
-        // addDoc(w, "Managing Gigabytes", "55063554A");
-        // addDoc(w, "The Art of Computer Science", "9900333X");
         w.close();
 
+    
         //loop query
         while(true){
             Scanner obj = new Scanner(System.in); //create scanner obj
