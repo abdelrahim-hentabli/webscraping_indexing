@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -18,8 +19,17 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
+import java.io.FileReader;
+import com.opencsv.CSVReader;
+import java.util.Arrays;
+
+
 public class LuceneTest {
     public static void main(String[] args) throws IOException, ParseException {
+        //prep for csv reader
+        CSVReader csvReader = new CSVReader(new FileReader("./output.csv"));
+        String [] nextLine;
+
         // 0. Specify the analyzer for tokenizing text.
         //    The same analyzer should be used for indexing and searching
         StandardAnalyzer analyzer = new StandardAnalyzer();
@@ -30,21 +40,25 @@ public class LuceneTest {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
         IndexWriter w = new IndexWriter(index, config);
-        addDoc(w, "Lucene in Action", "193398817");
-        addDoc(w, "Lucene for Dummies", "55320055Z");
-        addDoc(w, "Managing Gigabytes", "55063554A");
-        addDoc(w, "The Art of Computer Science", "9900333X");
+        while ((nextLine = csvReader.readNext()) != null){
+            // String [] values = Arrays.asList(nextLine);
+            addDoc(w, nextLine[3], nextLine[0]);
+        }
+        // addDoc(w, "Lucene in Action", "193398817");
+        // addDoc(w, "Lucene for Dummies", "55320055Z");
+        // addDoc(w, "Managing Gigabytes", "55063554A");
+        // addDoc(w, "The Art of Computer Science", "9900333X");
         w.close();
 
         // 2. query
-        String querystr = args.length > 0 ? args[0] : "lucene";
+        String querystr = args.length > 0 ? args[0] : "Biden";
 
         // the "title" arg specifies the default field to use
         // when no field is explicitly specified in the query.
         Query q = new QueryParser("title", analyzer).parse(querystr);
 
         // 3. search
-        int hitsPerPage = 10;
+        int hitsPerPage = 25;
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
         TopDocs docs = searcher.search(q, hitsPerPage);
