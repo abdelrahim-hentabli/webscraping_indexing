@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -22,6 +23,7 @@ import org.apache.lucene.store.RAMDirectory;
 import java.io.FileReader;
 import com.opencsv.CSVReader;
 import java.util.Arrays;
+import java.util.Scanner;
 
 
 public class LuceneTest {
@@ -44,37 +46,51 @@ public class LuceneTest {
             // String [] values = Arrays.asList(nextLine);
             addDoc(w, nextLine[3], nextLine[0]);
         }
+
+        // 1. create the index
         // addDoc(w, "Lucene in Action", "193398817");
         // addDoc(w, "Lucene for Dummies", "55320055Z");
         // addDoc(w, "Managing Gigabytes", "55063554A");
         // addDoc(w, "The Art of Computer Science", "9900333X");
         w.close();
 
-        // 2. query
-        String querystr = args.length > 0 ? args[0] : "Biden";
+        //loop query
+        while(true){
+            Scanner obj = new Scanner(System.in); //create scanner obj
 
-        // the "title" arg specifies the default field to use
-        // when no field is explicitly specified in the query.
-        Query q = new QueryParser("title", analyzer).parse(querystr);
+            System.out.println("Enter Query: (\"quit\" to exit)");
+            String querystr = obj.nextLine(); //read user input
+        
+            if(querystr.equals("quit")){
+                break;
+            }
 
-        // 3. search
-        int hitsPerPage = 25;
-        IndexReader reader = DirectoryReader.open(index);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        TopDocs docs = searcher.search(q, hitsPerPage);
-        ScoreDoc[] hits = docs.scoreDocs;
+            // 2. query
+            // String querystr = args.length > 0 ? args[0] : "Biden";
 
-        // 4. display results
-        System.out.println("Found " + hits.length + " hits.");
-        for(int i=0;i<hits.length;++i) {
-            int docId = hits[i].doc;
-            Document d = searcher.doc(docId);
-            System.out.println((i + 1) + ". " + d.get("isbn") + "\t" + d.get("title"));
+            // the "title" arg specifies the default field to use
+            // when no field is explicitly specified in the query.
+            // Query q = new QueryParser("title", analyzer).parse(querystr);
+            Query q = new QueryParser("title", analyzer).parse(querystr);
+
+            // 3. search
+            int hitsPerPage = 25;
+            IndexReader reader = DirectoryReader.open(index);
+            IndexSearcher searcher = new IndexSearcher(reader);
+            TopDocs docs = searcher.search(q, hitsPerPage);
+            ScoreDoc[] hits = docs.scoreDocs;
+
+            // 4. display results
+            System.out.println("Found " + hits.length + " hits.");
+            for(int i=0;i<hits.length;++i) {
+                int docId = hits[i].doc;
+                Document d = searcher.doc(docId);
+                System.out.println((i + 1) + ". " + d.get("isbn") + "\t" + d.get("title"));
+            }
+            // reader can only be closed when there
+            // is no need to access the documents any more.
+            reader.close();
         }
-
-        // reader can only be closed when there
-        // is no need to access the documents any more.
-        reader.close();
     }
 
     private static void addDoc(IndexWriter w, String title, String isbn) throws IOException {
