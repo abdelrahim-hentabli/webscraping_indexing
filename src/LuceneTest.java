@@ -51,9 +51,11 @@ public class LuceneTest {
             //Hashtag inputting (Work in progress)
             if(!nextLine[6].equals("[]")){
                 String[] hashtags = nextLine[6].split(",");
+                String tempHash = "";
                 for(int i = 0; i < hashtags.length; i++){
-                    doc.add(new TextField("hashtag", hashtags[i].substring(2,hashtags[i].length()-2),Field.Store.YES));
+                    tempHash += hashtags[i].substring(2,hashtags[i].length()-2) + " ";
                 }
+                doc.add(new TextField("hashtag", tempHash,Field.Store.YES));
             }
             String fullSearchableText = nextLine[1] + " " + nextLine[3] + " " + nextLine[6];
             doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
@@ -97,7 +99,7 @@ public class LuceneTest {
             // the "title" arg specifies the default field to use
             // when no field is explicitly specified in the query.
             // Query q = new QueryParser("title", analyzer).parse(querystr);
-            
+
             // we can add a if condition to check for specific fields in the query based on the user input
             // for ex. if user inputs #loser, then QueryParser("hashtag") etc..
             Query q = new QueryParser("content", analyzer).parse(querystr);
