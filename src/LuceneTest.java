@@ -97,6 +97,7 @@ public class LuceneTest {
             // the "title" arg specifies the default field to use
             // when no field is explicitly specified in the query.
             // Query q = new QueryParser("title", analyzer).parse(querystr);
+            
             // we can add a if condition to check for specific fields in the query based on the user input
             // for ex. if user inputs #loser, then QueryParser("hashtag") etc..
             Query q = new QueryParser("content", analyzer).parse(querystr);
@@ -113,7 +114,12 @@ public class LuceneTest {
             for(int i=0;i<hits.length;++i) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                System.out.println((i + 1) + ". "+ "(score: " + hits[i].score + ") " + "@" + d.get("id") + " - " + d.get("tweet") + " | " + d.get("hashtag"));
+                if(d.get("hashtag") == null){
+                    System.out.println((i + 1) + ". "+ "(score: " + hits[i].score + ") " + "@" + d.get("id") + " - " + d.get("tweet"));
+                }
+                else{
+                    System.out.println((i + 1) + ". "+ "(score: " + hits[i].score + ") " + "@" + d.get("id") + " - " + d.get("tweet") + " | " + d.get("hashtag"));
+                }
             }
             // reader can only be closed when there
             // is no need to access the documents any more.
