@@ -42,9 +42,26 @@ public class LuceneTest {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
         IndexWriter w = new IndexWriter(index, config);
+        
         while ((nextLine = csvReader.readNext()) != null){
+
+            Document doc = new Document(); 
+            doc.add(new TextField("id", nextLine[1], Field.Store.YES));
+            doc.add(new TextField("tweet", nextLine[3], Field.Store.YES));
+            //Hashtag inputting (Work in progress)
+            if(!nextLine[6].equals("[]")){
+                String[] hashtags = nextLine[6].split(",");
+                for(int i = 0; i < hashtags.length; i++){
+                    doc.add(new TextField("hashtag", hashtags[i].substring(2,hashtags[i].length()-2),Field.Store.YES));
+                }
+            }
+            String fullSearchableText = nextLine[1] + " " + nextLine[3] + " " + nextLine[6];
+            doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
+                
+            w.addDocument(doc);
+
             // String [] values = Arrays.asList(nextLine);
-            addDoc(w, nextLine[3], nextLine[0]);
+            // addDoc(w, nextLine[3], nextLine[0]);
             
             
             //Hashtag inputting (Work in progress)
@@ -80,10 +97,12 @@ public class LuceneTest {
             // the "title" arg specifies the default field to use
             // when no field is explicitly specified in the query.
             // Query q = new QueryParser("title", analyzer).parse(querystr);
-            Query q = new QueryParser("title", analyzer).parse(querystr);
+            // we can add a if condition to check for specific fields in the query based on the user input
+            // for ex. if user inputs #loser, then QueryParser("hashtag") etc..
+            Query q = new QueryParser("content", analyzer).parse(querystr);
 
             // 3. search
-            int hitsPerPage = 25;
+            int hitsPerPage = 100;
             IndexReader reader = DirectoryReader.open(index);
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs docs = searcher.search(q, hitsPerPage);
@@ -94,7 +113,7 @@ public class LuceneTest {
             for(int i=0;i<hits.length;++i) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                System.out.println((i + 1) + ". " + d.get("isbn") + "\t" + d.get("title"));
+                System.out.println((i + 1) + ". "+ "(score: " + hits[i].score + ") " + "@" + d.get("id") + " - " + d.get("tweet") + " | " + d.get("hashtag"));
             }
             // reader can only be closed when there
             // is no need to access the documents any more.
