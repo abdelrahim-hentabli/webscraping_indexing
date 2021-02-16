@@ -21,6 +21,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
 import java.io.FileReader;
+import java.io.FileWriter;
+
 import com.opencsv.CSVReader;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -29,7 +31,7 @@ import java.util.Scanner;
 public class LuceneTest {
     public static void main(String[] args) throws IOException, ParseException {
         //prep for csv reader
-        CSVReader csvReader = new CSVReader(new FileReader("./output.csv"));
+        CSVReader csvReader = new CSVReader(new FileReader("./tweets.csv"));
         String [] nextLine;
 
         // 0. Specify the analyzer for tokenizing text.
@@ -42,7 +44,11 @@ public class LuceneTest {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
         IndexWriter w = new IndexWriter(index, config);
+        FileWriter timingFile = new FileWriter("timing.csv");
         
+        long startTime = System.nanoTime();
+        long documentCount = 0;
+        long endTime; 
         while ((nextLine = csvReader.readNext()) != null){
 
             Document doc = new Document(); 
@@ -60,9 +66,11 @@ public class LuceneTest {
             }
             String fullSearchableText = nextLine[1] + " " + nextLine[3] + " " + nextLine[6];
             doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
-                
+            
             w.addDocument(doc);
-
+            documentCount++;
+            endTime = System.nanoTime();
+            timingFile.write(Long.toString(documentCount) + "," + Long.toString((endTime-startTime)/ 1000000) + "\n");
             // String [] values = Arrays.asList(nextLine);
             // addDoc(w, nextLine[3], nextLine[0]);
             
@@ -81,7 +89,7 @@ public class LuceneTest {
 
         // 1. create the index
         w.close();
-
+        timingFile.close();
     
         //loop query
         while(true){
