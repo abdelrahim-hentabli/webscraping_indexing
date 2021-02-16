@@ -50,10 +50,11 @@ public class LuceneTest {
             doc.add(new TextField("tweet", nextLine[3], Field.Store.YES));
             //Hashtag inputting (Work in progress)
             if(!nextLine[6].equals("[]")){
-                String[] hashtags = nextLine[6].split(",");
+                String temp = nextLine[6].substring(1,nextLine[6].length()-1);
+                String[] hashtags = temp.split(",");
                 String tempHash = "";
                 for(int i = 0; i < hashtags.length; i++){
-                    tempHash += hashtags[i].substring(2,hashtags[i].length()-2) + " ";
+                    tempHash += hashtags[i].substring(i==0?1:2,hashtags[i].length()-1) + " ";
                 }
                 doc.add(new TextField("hashtag", tempHash,Field.Store.YES));
             }
@@ -92,7 +93,16 @@ public class LuceneTest {
             if(querystr.equals("quit")){
                 break;
             }
-
+            Query q;
+            if(querystr.charAt(0) == '#'){
+                q = new QueryParser("hashtag", analyzer).parse(querystr);
+            }
+            else if(querystr.charAt(0) == '@'){
+                q = new QueryParser("id", analyzer).parse(querystr);
+            }
+            else{
+                q = new QueryParser("content", analyzer).parse(querystr);
+            }
             // 2. query
             // String querystr = args.length > 0 ? args[0] : "Biden";
 
@@ -102,7 +112,6 @@ public class LuceneTest {
 
             // we can add a if condition to check for specific fields in the query based on the user input
             // for ex. if user inputs #loser, then QueryParser("hashtag") etc..
-            Query q = new QueryParser("content", analyzer).parse(querystr);
 
             // 3. search
             int hitsPerPage = 100;
