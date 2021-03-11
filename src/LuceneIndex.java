@@ -34,7 +34,7 @@ import java.util.Scanner;
 public class LuceneIndex {
     public static void main(String[] args) throws IOException {
         //prep for csv reader
-        CSVReader csvReader = new CSVReader(new FileReader("./tweets.csv"));
+        CSVReader csvReader = new CSVReader(new FileReader("./tweets_new.csv"));
         String [] nextLine;
 
         // 0. Specify the analyzer for tokenizing text.
