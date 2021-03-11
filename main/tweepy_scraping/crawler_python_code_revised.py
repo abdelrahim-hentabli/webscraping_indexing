@@ -16,7 +16,7 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 
 class CustomStreamListener(tweepy.StreamListener):
     def on_status(self, status):
-        with open('../tweets.csv', 'a') as f:
+        with open(os.path.join(os.getcwd(),'..','tweets_new.csv'), 'a') as f:
             if hasattr(status, "retweeted_status"):
                 try:
                     writer = csv.writer(f)
