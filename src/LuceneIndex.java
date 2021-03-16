@@ -1,5 +1,10 @@
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
@@ -21,14 +26,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.store.FSDirectory;
 
-
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.nio.file.Paths;
-
 import com.opencsv.CSVReader;
-import java.util.Arrays;
-import java.util.Scanner;
 
 
 public class LuceneIndex {
@@ -75,23 +73,7 @@ public class LuceneIndex {
             documentCount++;
             endTime = System.nanoTime();
             timingFile.write(Long.toString(documentCount) + "," + Long.toString((endTime-startTime)/ 1000000) + "\n");
-            // String [] values = Arrays.asList(nextLine);
-            // addDoc(w, nextLine[3], nextLine[0]);
-            
-            
-            //Hashtag inputting (Work in progress)
-            // if(!nextLine[6].equals("[]")){
-            //     String[] hashtags = nextLine[6].split(",");
-            //     for(int i = 0; i < hashtags.length; i++){
-            //         addDoc(w, hashtags[i].substring(2,hashtags[i].length()-2), nextLine[0]);
-            //     }
-            // }
-            // else{
-            //     addDoc(w, nextLine[3], nextLine[0]);
-            // }
         }
-
-        // 1. create the index
         w.close();
         timingFile.close();
     }

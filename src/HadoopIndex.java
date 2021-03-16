@@ -1,6 +1,15 @@
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.nio.file.Paths;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -13,6 +22,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
+import com.opencsv.CSVReader;
 
 
 public class HadoopIndex {
@@ -148,8 +158,8 @@ public class HadoopIndex {
         stopWords.add("now");
     }    
     public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
-        private final static IntWritable one = new IntWritable(1);
         private final Text word = new Text();
+        private final IntWritable one = new IntWritable(1);
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String[] itr = value.toString().split("[^a-zA-Z]",0);
             String lowerWord;
@@ -157,7 +167,7 @@ public class HadoopIndex {
                 lowerWord = itr[i].toLowerCase();
                 if(!itr[i].isEmpty() && !stopWords.contains(lowerWord)){
                     word.set(lowerWord);
-                    context.write(word, key);
+                    context.write(word, one);
                 }
             }
         }
@@ -167,13 +177,23 @@ public class HadoopIndex {
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
             int sum = 0;
             for (IntWritable val : values) {
-                sum += val.get();
+                sum+=1;
             }
             result.set(sum);
             context.write(key, result);
         }
     }
     public static void main(String[] args) throws Exception {
+        CSVReader csvReader = new CSVReader(new FileReader("./tweets_new.csv"));
+        String[] nextLine;
+        ArrayList<String[]> fullTweets = new ArrayList<String[]>();
+        HashMap<String, Integer> id_to_index = new HashMap<String, Integer>();
+        int index = 0;
+        while((nextLine = csvReader.readNext()) != null){
+            fullTweets.add(nextLine);
+            id_to_index.put(nextLine[0], index);
+            index++;
+        }
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "word count");
         job.setJarByClass(HadoopIndex.class);
