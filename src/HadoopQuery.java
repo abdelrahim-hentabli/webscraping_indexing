@@ -24,7 +24,7 @@ public class HadoopQuery {
             fullTweets.add(nextLine);
             index++;
         }
-        BufferedReader hadoopIndex = new BufferedReader(new FileReader(path));
+        BufferedReader hadoopIndex = new BufferedReader(new FileReader("./index.hadoop/part-r-00000"));
         String line;
         while((line = hadoopIndex.readLine())!= null){
             nextLine = line.split("\\s+");
@@ -34,11 +34,45 @@ public class HadoopQuery {
                         word_to_index_count.get(nextLine[0]).add(new Pair<Integer, Integer>(id_to_index.get(nextLine[i]), Integer.parseInt(nextLine[i+2])));
                     }
                 }
+                else{
+                    if(id_to_index.containsKey(nextLine[i])){
+                        word_to_index_count.put(nextLine[0], new ArrayList<Pair<Integer, Integer>>());
+                        word_to_index_count.get(nextLine[0]).add(new Pair<Integer, Integer>(id_to_index.get(nextLine[i]), Integer.parseInt(nextLine[i+2])));
+                    }
+                }
 
             }
         }
+        hadoopIndex.close();
     }
-    public void query(String querystr){
-
+    public String[][] query(String querystr){
+        String[] words = querystr.split("\\s+");
+        HashMap<Integer, Integer> tweetToCount = new HashMap<Integer, Integer>();
+        ArrayList<Pair<Integer, Integer>> temp = new ArrayList<Pair<Integer, Integer>>();
+        for(int i = 0; i < words.length; i++){
+            if(word_to_index_count.containsKey(words[i])){
+                temp = word_to_index_count.get(words[i]);
+                for(int j = 0; j < temp.size(); j++){
+                    if(tweetToCount.containsKey(temp.get(j).first)){
+                        tweetToCount.put(temp.get(j).first, tweetToCount.get(temp.get(j).first) + temp.get(j).second );
+                    }
+                    else{
+                        tweetToCount.put(temp.get(j).first, temp.get(j).second );
+                    }
+                }
+            }
+        }
+        if(tweetToCount.size() == 0){
+            return null;
+        }
+        String[][] output = new String[tweetToCount.size()][3];
+        Integer i = 0;
+        for(Integer index: tweetToCount.keySet()){
+            output[i][0] = String.valueOf(i);
+            output[i][1] = "@" + fullTweets.get(index)[1];
+            output[i][2] = fullTweets.get(index)[3];
+            i++;
+        }
+        return output;
     }
 }
