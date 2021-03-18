@@ -17,14 +17,16 @@ public class TweetController {
 
   @GetMapping("/lucene")
   @ResponseBody
-  public Response sayLucene() {
+  public Response[] sayLucene() {
     // JSONObject jsonObject = new JSONObject();
     //   //Inserting key-value pairs into the json object
     // jsonObject.put("id", "1");
     // jsonObject.put("handle", "@Krishna Kasyap");
     // jsonObject.put("tweet", "Bhagavatula");
-
-    return new Response("1", "@Sam", "This is a tweet");
+    Response [] responses = new Response[2];
+    responses[0] = new Response("1", "@Sam", "This is a tweet");
+    responses[1] = new Response("1", "@something" , "A tweet from Lucene");
+    return responses;
   }
 
   @GetMapping("/hadoop")
