@@ -3,11 +3,13 @@ package com.example.actuatorservice;
 public class Response {
 
   private final long id;
-  private final String content;
+  private final String handle;
+  private final String tweet;
 
-  public Response(long id, String content) {
+  public Response(long id, String handle, String tweet) {
     this.id = id;
-    this.content = content;
+    this.handle = handle;
+    this.tweet = tweet;
   }
 
   public long getId() {
@@ -15,7 +17,11 @@ public class Response {
   }
 
   public String getContent() {
-    return content;
+    return handle;
+  }
+
+  public String getTweet() {
+    return tweet;
   }
 
 }
