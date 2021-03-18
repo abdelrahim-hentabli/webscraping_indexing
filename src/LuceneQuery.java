@@ -1,3 +1,5 @@
+package LQ;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -31,7 +33,11 @@ import com.opencsv.CSVReader;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class LuceneQuery {
+interface Lucene {
+    String [][] query();
+}
+
+public abstract class LuceneQuery implements Lucene {
     private  FSDirectory index;
     private StandardAnalyzer analyzer;
     public LuceneQuery() throws IOException{
@@ -39,7 +45,7 @@ public class LuceneQuery {
         StandardAnalyzer analyzer = new StandardAnalyzer();
     }
 
-    public void query(String querystr) throws IOException, ParseException{
+    public String[][] query(String querystr) throws IOException, ParseException{
         Scanner obj = new Scanner(System.in); //create scanner obj
         Query q = new QueryParser("content", analyzer).parse(querystr);
         int hitsPerPage = 100;
@@ -47,6 +53,18 @@ public class LuceneQuery {
         IndexSearcher searcher = new IndexSearcher(reader);
         TopDocs docs = searcher.search(q, hitsPerPage);
         ScoreDoc[] hits = docs.scoreDocs;
+        
+        String [][] results = new String [hits.length][4];
+        for(int i = 0; i < results.length; i++){
+            int docId = hits[i].doc;
+            Document d = searcher.doc(docId);
+            results[i][0] = String.valueOf(i);
+            results[i][1] = "@" + d.get("id");
+            results[i][2] = d.get("tweet");
+            results[i][3] = d.get("hashtag");
+        }
+        return results;
+
     }
     public static void main(String[] args) throws IOException, ParseException{
         
