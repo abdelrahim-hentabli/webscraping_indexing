@@ -1,6 +1,5 @@
 package com.example.actuatorservice;
 
-import LQ.LuceneQuery;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,6 @@ public class TweetController {
   public Response[] sayLucene(String query) {
 
     LuceneQuery client;
-    // client.query(query);
     Response [] responses = new Response[2];
     responses[0] = new Response("1", "@Sam", "This is a tweet");
     responses[1] = new Response("2", "@something" , "A tweet from Lucene");
