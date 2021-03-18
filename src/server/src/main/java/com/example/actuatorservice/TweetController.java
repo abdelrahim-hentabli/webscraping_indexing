@@ -13,9 +13,15 @@ public class TweetController {
   private static final String template = "Hello, %s!";
   private final AtomicLong counter = new AtomicLong();
 
-  @GetMapping("/hello-world")
+  @GetMapping("/lucene")
   @ResponseBody
-  public Response sayHello(@RequestParam(name="name", required=false, defaultValue="Stranger") String name) {
+  public Response sayLucene(@RequestParam(name="name", required=false, defaultValue="Lucene") String name) {
+    return new Response(counter.incrementAndGet(), String.format(template, name));
+  }
+
+  @GetMapping("/hadoop")
+  @ResponseBody
+  public Response sayHadoop(@RequestParam(name="name", required=false, defaultValue="Hadoop") String name) {
     return new Response(counter.incrementAndGet(), String.format(template, name));
   }
 
