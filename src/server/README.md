@@ -1,4 +1,4 @@
-# Spring CLI Server
+# Spring Server
 
 ## Requirements
 `spring`
@@ -10,8 +10,6 @@
 `cd /main/server`
 
 `mvn spring-boot:run`
-
-`spring run app.groovy -- --server.port=9000`
 
 ## Update Dependencies
 

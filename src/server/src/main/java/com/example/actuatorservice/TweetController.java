@@ -2,7 +2,7 @@ package com.example.actuatorservice;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.json.simple.JSONObject;
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,19 +17,26 @@ public class TweetController {
 
   @GetMapping("/lucene")
   @ResponseBody
-  public Response sayLucene(@RequestParam(name="name", required=false, defaultValue="Lucene") String name) {
-    JSONObject jsonObject = new JSONObject();
-      //Inserting key-value pairs into the json object
-    jsonObject.put("id", "1");
-    jsonObject.put("handle", "@Krishna Kasyap");
-    jsonObject.put("tweet", "Bhagavatula");
-    return new Response(jsonObject);
+  public Response sayLucene() {
+    // JSONObject jsonObject = new JSONObject();
+    //   //Inserting key-value pairs into the json object
+    // jsonObject.put("id", "1");
+    // jsonObject.put("handle", "@Krishna Kasyap");
+    // jsonObject.put("tweet", "Bhagavatula");
+
+    return new Response("1", "@Sam", "This is a tweet");
   }
 
   @GetMapping("/hadoop")
   @ResponseBody
-  public Response sayHadoop(@RequestParam(name="name", required=false, defaultValue="Hadoop") String name) {
-    return new Response(counter.incrementAndGet(), String.format(template, name));
+  public Response sayHadoop() {
+    return new Response("1", "@something" , "A tweet from Hadoop");
   }
+
+  // @GetMapping("/hadoop")
+  // @ResponseBody
+  // public Response sayHadoop(@RequestParam(name="name", required=false, defaultValue="Hadoop") String name) {
+  //   return new Response(counter.incrementAndGet(), "@something" ,String.format(template, name));
+  // }
 
 }
