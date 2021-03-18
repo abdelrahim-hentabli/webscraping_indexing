@@ -1,13 +1,13 @@
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.HashSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.HashMap;
 
-import java.io.FileReader;
+
 import java.io.FileWriter;
 import java.nio.file.Paths;
 
@@ -24,7 +24,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
-import com.opencsv.CSVReader;
 
 
 public class HadoopIndex {
@@ -196,10 +195,6 @@ public class HadoopIndex {
         }
     }
     public static void main(String[] args) throws Exception {
-        CSVReader csvReader = new CSVReader(new FileReader("./tweets_new.csv"));
-        String[] nextLine;
-        ArrayList<String[]> fullTweets = new ArrayList<String[]>();
-        HashMap<String, Integer> id_to_index = new HashMap<String, Integer>();
         Configuration conf = new Configuration();
         conf.setBoolean(CSVLineRecordReader.IS_ZIPFILE, false);
         conf.setInt(CSVNLineInputFormat.LINES_PER_MAP, 40000);
