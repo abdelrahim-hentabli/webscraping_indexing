@@ -19,6 +19,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.CSVNLineInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.CSVLineRecordReader;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -158,30 +159,40 @@ public class HadoopIndex {
         stopWords.add("should");
         stopWords.add("now");
     }    
-    public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+    public static class TokenizerMapper extends Mapper<Object, List<Text>, Text, Text> {
         private final Text word = new Text();
-        private final IntWritable one = new IntWritable(1);
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            String[] itr = value.toString().split("[^a-zA-Z]",0);
-            String lowerWord;
-            for(int i = 0; i < itr.length; i++){
-                lowerWord = itr[i].toLowerCase();
-                if(!itr[i].isEmpty() && !stopWords.contains(lowerWord)){
-                    word.set(lowerWord);
-                    context.write(word, one);
+        private final Text id = new Text();
+        public void map(Object key, List<Text> values, Context context) throws IOException, InterruptedException {
+            if(values.size() > 3 && values.get(0).toString().length() == 19){
+                String[] itr = values.get(3).toString().split("[^a-zA-Z]",0);
+                id.set(values.get(0));
+                String lowerWord;
+                for(int i = 0; i < itr.length; i++){
+                    lowerWord = itr[i].toLowerCase();
+                    if(!itr[i].isEmpty() && !stopWords.contains(lowerWord)){
+                        word.set(lowerWord);
+                        context.write(word, id);
+                    }
                 }
             }
         }
     }
-    public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-        private IntWritable result = new IntWritable();
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            int sum = 0;
-            for (IntWritable val : values) {
-                sum+=1;
+    public static class IntSumReducer extends Reducer<Text, Text, Text, Text> {
+        public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            HashMap<String,Integer> tweet_idToCount = new HashMap<String,Integer>();
+            for (Text val : values) {
+                if(tweet_idToCount.containsKey(val.toString())){
+                    tweet_idToCount.put(val.toString(), tweet_idToCount.get(val.toString())+1);
+                }
+                else{
+                    tweet_idToCount.put(val.toString(), 1);
+                }
             }
-            result.set(sum);
-            context.write(key, result);
+            String invertedIndex = "";
+            for(String tweet_id: tweet_idToCount.keySet()){
+                invertedIndex += tweet_id + " : " + tweet_idToCount.get(tweet_id) + "\t"; 
+            }
+            context.write(key, new Text(invertedIndex));
         }
     }
     public static void main(String[] args) throws Exception {
@@ -189,20 +200,17 @@ public class HadoopIndex {
         String[] nextLine;
         ArrayList<String[]> fullTweets = new ArrayList<String[]>();
         HashMap<String, Integer> id_to_index = new HashMap<String, Integer>();
-        int index = 0;
-        while((nextLine = csvReader.readNext()) != null){
-            fullTweets.add(nextLine);
-            id_to_index.put(nextLine[0], index);
-            index++;
-        }
         Configuration conf = new Configuration();
+        conf.setBoolean(CSVLineRecordReader.IS_ZIPFILE, false);
+        conf.setInt(CSVNLineInputFormat.LINES_PER_MAP, 40000);
         Job job = Job.getInstance(conf, "word count");
         job.setJarByClass(HadoopIndex.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
-        job.setReducerClass(IntSumReducer.class);
+        //job.setReducerClass(IntSumReducer.class);
+        job.setInputFormatClass(CSVNLineInputFormat.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
+        job.setOutputValueClass(Text.class);
         CSVNLineInputFormat.addInputPath(job, new Path("tweets_new.csv"));
         FileOutputFormat.setOutputPath(job, new Path("index.hadoop"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
