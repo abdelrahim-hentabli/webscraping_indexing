@@ -1,8 +1,7 @@
 package com.example.actuatorservice;
 
+import LQ.LuceneQuery;
 import java.util.concurrent.atomic.AtomicLong;
-
-
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +16,14 @@ public class TweetController {
 
   @GetMapping("/lucene")
   @ResponseBody
-  public Response[] sayLucene() {
-    // JSONObject jsonObject = new JSONObject();
-    //   //Inserting key-value pairs into the json object
-    // jsonObject.put("id", "1");
-    // jsonObject.put("handle", "@Krishna Kasyap");
-    // jsonObject.put("tweet", "Bhagavatula");
+  public Response[] sayLucene(String query) {
+
+    LuceneQuery client;
+    // client.query(query);
     Response [] responses = new Response[2];
     responses[0] = new Response("1", "@Sam", "This is a tweet");
-    responses[1] = new Response("1", "@something" , "A tweet from Lucene");
-    return responses;
+    responses[1] = new Response("2", "@something" , "A tweet from Lucene");
+    return client.query(query);
   }
 
   @GetMapping("/hadoop")
