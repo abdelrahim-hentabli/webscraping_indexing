@@ -11,3 +11,8 @@
 
 `spring run app.groovy -- --server.port=9000`
 
+## Update Dependencies
+
+`mvn package`
+
+This will update any imports you need to use inside your files.
