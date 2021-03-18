@@ -1,7 +1,9 @@
 # Spring CLI Server
 
 ## Requirements
-`spring cli`
+`spring`
+`https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html#getting-started-installing-the-cli`
+
 `maven 3.2+`
 
 ## Running Server
