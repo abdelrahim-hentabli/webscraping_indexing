@@ -33,7 +33,7 @@ import java.util.Scanner;
 
 public class LuceneQuery {
     private  FSDirectory index;
-    StandardAnalyzer analyzer;
+    private StandardAnalyzer analyzer;
     public LuceneQuery() throws IOException{
         index = FSDirectory.open(Paths.get("./index.lucene"));
         StandardAnalyzer analyzer = new StandardAnalyzer();
