@@ -19,6 +19,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+
 import org.apache.lucene.store.FSDirectory;
 
 
@@ -31,7 +32,22 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class LuceneQuery {
+    private  FSDirectory index;
+    StandardAnalyzer analyzer;
+    public LuceneQuery() throws IOException{
+        index = FSDirectory.open(Paths.get("./index.lucene"));
+        StandardAnalyzer analyzer = new StandardAnalyzer();
+    }
 
+    public void query(String querystr) throws IOException, ParseException{
+        Scanner obj = new Scanner(System.in); //create scanner obj
+        Query q = new QueryParser("content", analyzer).parse(querystr);
+        int hitsPerPage = 100;
+        IndexReader reader = DirectoryReader.open(index);
+        IndexSearcher searcher = new IndexSearcher(reader);
+        TopDocs docs = searcher.search(q, hitsPerPage);
+        ScoreDoc[] hits = docs.scoreDocs;
+    }
     public static void main(String[] args) throws IOException, ParseException{
         
         FSDirectory index = FSDirectory.open(Paths.get("./index.lucene"));
@@ -46,19 +62,7 @@ public class LuceneQuery {
             if(querystr.equals("quit")){
                 break;
             }
-            // Query q;
-            // if(querystr.charAt(0) == '#'){
-            //     q = new QueryParser("hashtag", analyzer).parse(querystr);
-            // }
-            // else if(querystr.charAt(0) == '@'){
-            //     q = new QueryParser("id", analyzer).parse(querystr);
-            // }
-            // else{
-            //     q = new QueryParser("content", analyzer).parse(querystr);
-            // }
-            // 2. query
-            // String querystr = args.length > 0 ? args[0] : "Biden";
-    
+
             // the "title" arg specifies the default field to use
             // when no field is explicitly specified in the query.
             Query q = new QueryParser("content", analyzer).parse(querystr);
