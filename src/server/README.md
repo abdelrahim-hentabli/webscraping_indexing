@@ -7,7 +7,7 @@
 ## Running Server
 `cd /main/server`
 
-`spring spring-boot:run`
+`mvn spring-boot:run`
 
 `spring run app.groovy -- --server.port=9000`
 
